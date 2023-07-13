@@ -14,6 +14,9 @@ mongoose.connect('mongodb+srv://remifborel:Mongodb95210@cluster0.ozfvibz.mongodb
   .then(() => console.log('Connexion à MongoDB réussie !'))
   .catch(() => console.log('Connexion à MongoDB échouée !'));
 
+
+  /*en-tete debug CORS*/
+
 app.use((req, res, next) => {
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content, Accept, Content-Type, Authorization');
