@@ -1,14 +1,22 @@
 const express = require('express');
+const helmet = require('helmet');
 const mongoose = require ('mongoose');
 const path = require('path');
+const dotenv = require('dotenv').config();
 
 const userRoutes = require('./routes/user');
 const saucesRoutes = require('./routes/sauces');
 
 const app = express();
+app.use(helmet({
+  crossOriginResourcePolicy: false,
+}));
 app.use(express.json());
 
-mongoose.connect('mongodb+srv://remifborel:Mongodb95210@cluster0.ozfvibz.mongodb.net/',
+/* connection MongoDB*/
+
+const uri = process.env.URI;
+mongoose.connect(uri,
   { useNewUrlParser: true,
     useUnifiedTopology: true })
   .then(() => console.log('Connexion à MongoDB réussie !'))

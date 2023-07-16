@@ -61,7 +61,7 @@ exports.getOneSauce = (req, res, next) => {
 
 
  /*fonction pour modifier un produit*/
- 
+
   exports.modifySauce = (req, res, next) => {
     const sauceObject = req.file ? {
         ...JSON.parse(req.body.sauce),
@@ -83,3 +83,53 @@ exports.getOneSauce = (req, res, next) => {
             res.status(400).json({ error });
         });
  };
+
+ /* fonction pour les likes*/
+
+
+ exports.like = (req, res, next) => {
+  const userId = req.body.userId;
+  const sauceId = req.params.id;
+
+  if (req.body.like == 1) {
+    Sauce.updateOne(
+      { _id: sauceId },
+      { $inc: { likes: 1 }, $push: { usersLiked: userId } }
+    )
+      .then(() => res.status(200).json({ message: "Vous aimez cette sauce !" }))
+      .catch((error) => res.status(400).json({ error }));
+  } else if (req.body.like == -1) {
+    Sauce.updateOne(
+      { _id: sauceId },
+      { $inc: { dislikes: 1 }, $push: { usersDisliked: userId } }
+    )
+      .then(() =>
+        res.status(200).json({ message: "Vous n'aimez pas cette sauce !" })
+      )
+      .catch((error) => res.status(400).json({ error }));
+  } else if (req.body.like == 0) {
+    Sauce.findOne({ _id: sauceId })
+      .then((sauce) => {
+        if (sauce.usersLiked.includes(userId)) {
+          Sauce.updateOne(
+            { _id: sauceId },
+            { $inc: { likes: -1 }, $pull: { usersLiked: userId } }
+          )
+            .then(() =>
+              res
+                .status(200)
+                .json({ message: "Vous n'aimez plus cette sauce !" })
+            )
+            .catch((error) => res.status(400).json({ error }));
+        } else if (sauce.usersDisliked.includes(userId)) {
+          Sauce.updateOne(
+            { _id: sauceId },
+            { $inc: { dislikes: -1 }, $pull: { usersDisliked: userId } }
+          )
+            .then(() => res.status(200).json({ message: "Plus de dislike !" }))
+            .catch((error) => res.status(400).json({ error }));
+        }
+      })
+      .catch((error) => res.status(400).json({ error }));
+  }
+};
